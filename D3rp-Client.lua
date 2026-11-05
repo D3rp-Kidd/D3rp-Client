@@ -986,6 +986,185 @@ if game.PlaceId == 123974602339071 then
     baseplateOpener.LayoutOrder = 140
 end
 
+
+-- Music Player: plays audio locally for this client.
+local musicPlayer, musicHeader, musicClose = makeWindow(
+    "MusicPlayerWindow",
+    "D3rp Client - Music Player",
+    UDim2.fromOffset(420, 340),
+    UDim2.new(0.5, -210, 0.5, -170),
+    gui
+)
+musicPlayer.Visible = false
+makeDraggable(musicPlayer, musicHeader)
+
+local musicStatus = Instance.new("TextLabel")
+musicStatus.Name = "MusicStatus"
+musicStatus.Position = UDim2.fromOffset(12, 45)
+musicStatus.Size = UDim2.new(1, -24, 0, 22)
+musicStatus.BackgroundTransparency = 1
+musicStatus.Text = "Enter a Roblox audio ID to play it."
+musicStatus.TextColor3 = WHITE
+musicStatus.Font = Enum.Font.Code
+musicStatus.TextSize = 13
+musicStatus.TextXAlignment = Enum.TextXAlignment.Left
+musicStatus.Parent = musicPlayer
+
+local soundIdInput = Instance.new("TextBox")
+soundIdInput.Name = "SoundIdInput"
+soundIdInput.Position = UDim2.fromOffset(12, 72)
+soundIdInput.Size = UDim2.new(1, -24, 0, 36)
+soundIdInput.BackgroundColor3 = BLACK
+soundIdInput.BorderColor3 = RED
+soundIdInput.BorderSizePixel = 1
+soundIdInput.TextColor3 = WHITE
+soundIdInput.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
+soundIdInput.PlaceholderText = "Type Roblox Sound ID (or rbxassetid://...)"
+soundIdInput.Text = ""
+soundIdInput.ClearTextOnFocus = false
+soundIdInput.Font = Enum.Font.Code
+soundIdInput.TextSize = 14
+soundIdInput.Parent = musicPlayer
+addDoubleOutline(soundIdInput, 1)
+
+local musicPlayButton = Instance.new("TextButton")
+musicPlayButton.Name = "PlaySoundButton"
+musicPlayButton.Position = UDim2.fromOffset(12, 116)
+musicPlayButton.Size = UDim2.new(0.5, -18, 0, 34)
+styleButton(musicPlayButton, "PLAY SOUND", RED)
+musicPlayButton.Parent = musicPlayer
+
+local musicStopButton = Instance.new("TextButton")
+musicStopButton.Name = "StopSoundButton"
+musicStopButton.Position = UDim2.new(0.5, 6, 0, 116)
+musicStopButton.Size = UDim2.new(0.5, -18, 0, 34)
+styleButton(musicStopButton, "STOP SOUND", WHITE)
+musicStopButton.Parent = musicPlayer
+
+local musicNowPlaying = Instance.new("TextLabel")
+musicNowPlaying.Name = "NowPlaying"
+musicNowPlaying.Position = UDim2.fromOffset(12, 155)
+musicNowPlaying.Size = UDim2.new(1, -24, 0, 22)
+musicNowPlaying.BackgroundTransparency = 1
+musicNowPlaying.Text = "Built-in songs"
+musicNowPlaying.TextColor3 = RED
+musicNowPlaying.Font = Enum.Font.Code
+musicNowPlaying.TextSize = 15
+musicNowPlaying.TextXAlignment = Enum.TextXAlignment.Left
+musicNowPlaying.Parent = musicPlayer
+
+local builtInList = Instance.new("ScrollingFrame")
+builtInList.Name = "BuiltInSongs"
+builtInList.Position = UDim2.fromOffset(12, 180)
+builtInList.Size = UDim2.new(1, -24, 1, -192)
+builtInList.BackgroundTransparency = 1
+builtInList.BorderSizePixel = 0
+builtInList.ScrollBarThickness = 5
+builtInList.ScrollBarImageColor3 = RED
+builtInList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+builtInList.CanvasSize = UDim2.new()
+builtInList.Parent = musicPlayer
+
+local builtInLayout = Instance.new("UIListLayout")
+builtInLayout.Padding = UDim.new(0, 6)
+builtInLayout.SortOrder = Enum.SortOrder.LayoutOrder
+builtInLayout.Parent = builtInList
+
+local currentMusicSound
+local function stopMusic()
+    if currentMusicSound then
+        pcall(function() currentMusicSound:Stop() end)
+        currentMusicSound:Destroy()
+        currentMusicSound = nil
+    end
+    musicStatus.Text = "Playback stopped."
+end
+
+local function playMusicId(rawId, label)
+    local id = tostring(rawId or ""):gsub("%s+", "")
+    id = id:gsub("^rbxassetid://", "")
+    if not id:match("^%d+$") then
+        musicStatus.Text = "Enter a numeric Roblox audio ID."
+        return
+    end
+    stopMusic()
+    local sound = Instance.new("Sound")
+    sound.Name = "D3rpMusicPlayerSound"
+    sound.SoundId = "rbxassetid://" .. id
+    sound.Volume = 0.5
+    sound.Looped = false
+    sound.Parent = playerGui
+    currentMusicSound = sound
+    musicStatus.Text = "Loading audio..."
+    local ok, err = pcall(function() sound:Play() end)
+    if not ok then
+        musicStatus.Text = "Couldn't play this audio. Check its permissions/ID."
+        warn("D3rp Music Player: " .. tostring(err))
+        sound:Destroy()
+        currentMusicSound = nil
+        return
+    end
+    musicNowPlaying.Text = label or ("Sound ID: " .. id)
+    task.spawn(function()
+        local loaded = false
+        local success = pcall(function()
+            sound.Loaded:Wait()
+            loaded = true
+        end)
+        if currentMusicSound == sound and sound.Parent then
+            if success and loaded then
+                musicStatus.Text = "Now playing locally."
+            else
+                musicStatus.Text = "Audio may be unavailable or restricted."
+            end
+        end
+    end)
+    sound.Ended:Connect(function()
+        if currentMusicSound == sound then
+            currentMusicSound = nil
+            sound:Destroy()
+            musicStatus.Text = "Playback finished."
+        end
+    end)
+end
+
+musicPlayButton.Activated:Connect(function()
+    playMusicId(soundIdInput.Text)
+end)
+soundIdInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then playMusicId(soundIdInput.Text) end
+end)
+musicStopButton.Activated:Connect(stopMusic)
+musicClose.Activated:Connect(function() animateWindow(musicPlayer, false) end)
+
+-- Built-in entries are placeholders until you add your chosen audio IDs.
+-- Replace the empty IDs with audio assets you own or have permission to use.
+local builtInSongs = {
+    {name = "Built-in Song 1", id = ""},
+    {name = "Built-in Song 2", id = ""},
+    {name = "Built-in Song 3", id = ""},
+}
+for index, song in ipairs(builtInSongs) do
+    local songButton = Instance.new("TextButton")
+    songButton.Name = "BuiltInSong" .. index
+    songButton.Size = UDim2.new(1, -4, 0, 32)
+    songButton.LayoutOrder = index
+    styleButton(songButton, song.name, WHITE)
+    songButton.Parent = builtInList
+    songButton.Activated:Connect(function()
+        if song.id == "" then
+            musicStatus.Text = "Add a Sound ID for this built-in song in the script."
+            return
+        end
+        soundIdInput.Text = song.id
+        playMusicId(song.id, song.name)
+    end)
+end
+
+addButton("Music Player", function()
+    animateWindow(musicPlayer, not musicPlayer.Visible)
+end)
+
 -- Settings opener on the main button list.
 addButton("Settings", function() animateWindow(settingsFrame, not settingsFrame.Visible) end)
 
