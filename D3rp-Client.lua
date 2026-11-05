@@ -806,14 +806,72 @@ addHub("AirHub", function()
         warn("Failed to load AirHub: " .. tostring(err))
     end
 end)
--- Touch Fling (created by D3rp) - opens from its own main-menu button.
+-- Track Touch Fling GUI instances created from this button.
+local touchFlingGuis = {}
+
+local function destroyTouchFlingGuis()
+    for _, instance in ipairs(touchFlingGuis) do
+        if instance and instance.Parent then
+            instance:Destroy()
+        end
+    end
+    table.clear(touchFlingGuis)
+
+    -- Also clean up matching GUI instances if the script was loaded outside this button.
+    for _, container in ipairs({playerGui, game:GetService("CoreGui")}) do
+        local ok, descendants = pcall(function() return container:GetDescendants() end)
+        if ok then
+            for _, object in ipairs(descendants) do
+                if object:IsA("ScreenGui") and (
+                    object.Name:lower():find("touchfling", 1, true)
+                    or object.Name:lower():find("touch_fling", 1, true)
+                    or object.Name:lower():find("touch fling", 1, true)
+                ) then
+                    pcall(function() object:Destroy() end)
+                end
+            end
+        end
+    end
+end
+
 addButton("Touch Fling", function()
+    -- Remove a previous copy before spawning a fresh one.
+    destroyTouchFlingGuis()
+
+    local before = {}
+    for _, container in ipairs({playerGui, game:GetService("CoreGui")}) do
+        pcall(function()
+            for _, object in ipairs(container:GetDescendants()) do
+                if object:IsA("ScreenGui") then before[object] = true end
+            end
+        end)
+    end
+
     local success, err = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/D3rp-Kidd/Touch-Fling/refs/heads/main/Touch_fling_animated_close_open.lua"))()
     end)
-    if not success then
+
+    if success then
+        task.wait(0.25)
+        for _, container in ipairs({playerGui, game:GetService("CoreGui")}) do
+            pcall(function()
+                for _, object in ipairs(container:GetDescendants()) do
+                    if object:IsA("ScreenGui") and not before[object] then
+                        local name = object.Name:lower()
+                        if name:find("touchfling", 1, true) or name:find("touch_fling", 1, true) or name:find("touch fling", 1, true) then
+                            table.insert(touchFlingGuis, object)
+                        end
+                    end
+                end
+            end)
+        end
+    else
         warn("Failed to load Touch Fling: " .. tostring(err))
     end
+end)
+
+addButton("Destroy All Touch Fling Scripts", function()
+    destroyTouchFlingGuis()
 end)
 
 addButton("Hubs", function() animateWindow(hubsFrame, not hubsFrame.Visible) end)
