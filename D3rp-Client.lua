@@ -987,6 +987,66 @@ if game.PlaceId == 123974602339071 then
 end
 
 
+-- Local-only Invisibility toggle (visual effect on this client; not server-side).
+local invisEnabled = false
+local invisOriginals = {}
+
+local function setCharacterInvisible(character, invisible)
+    if not character then return end
+    for _, object in ipairs(character:GetDescendants()) do
+        if object:IsA("BasePart") then
+            if invisOriginals[object] == nil then
+                invisOriginals[object] = object.LocalTransparencyModifier
+            end
+            object.LocalTransparencyModifier = invisible and 1 or invisOriginals[object]
+        elseif object:IsA("Decal") or object:IsA("Texture") then
+            if invisOriginals[object] == nil then
+                invisOriginals[object] = object.Transparency
+            end
+            object.Transparency = invisible and 1 or invisOriginals[object]
+        elseif object:IsA("ParticleEmitter") or object:IsA("Trail") or object:IsA("Beam") then
+            if invisOriginals[object] == nil then
+                invisOriginals[object] = object.Enabled
+            end
+            object.Enabled = invisible and false or invisOriginals[object]
+        end
+    end
+    if not invisible then
+        -- Restore and clear saved values so future character changes are tracked cleanly.
+        for object, original in pairs(invisOriginals) do
+            if object and object.Parent then
+                pcall(function()
+                    if object:IsA("BasePart") then
+                        object.LocalTransparencyModifier = original
+                    elseif object:IsA("Decal") or object:IsA("Texture") then
+                        object.Transparency = original
+                    elseif object:IsA("ParticleEmitter") or object:IsA("Trail") or object:IsA("Beam") then
+                        object.Enabled = original
+                    end
+                end)
+            end
+        end
+        table.clear(invisOriginals)
+    end
+end
+
+local invisButton = addButton("Invis: OFF (local)", function(button)
+    invisEnabled = not invisEnabled
+    button.Text = invisEnabled and "Invis: ON (local)" or "Invis: OFF (local)"
+    originalTexts[button] = button.Text
+    setCharacterInvisible(player.Character, invisEnabled)
+    updateLeet()
+end)
+invisButton.LayoutOrder = 85
+
+player.CharacterAdded:Connect(function(character)
+    table.clear(invisOriginals)
+    if invisEnabled then
+        task.wait(0.25)
+        setCharacterInvisible(character, true)
+    end
+end)
+
 -- Music Player: plays audio locally for this client.
 local musicPlayer, musicHeader, musicClose = makeWindow(
     "MusicPlayerWindow",
