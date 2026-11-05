@@ -806,6 +806,16 @@ addHub("AirHub", function()
         warn("Failed to load AirHub: " .. tostring(err))
     end
 end)
+-- Touch Fling (created by D3rp) - opens from its own main-menu button.
+addButton("Touch Fling", function()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/D3rp-Kidd/Touch-Fling/refs/heads/main/Touch_fling_animated_close_open.lua"))()
+    end)
+    if not success then
+        warn("Failed to load Touch Fling: " .. tostring(err))
+    end
+end)
+
 addButton("Hubs", function() animateWindow(hubsFrame, not hubsFrame.Visible) end)
 
 -- Game-specific hub: only create the opener while in Just a baseplate.
