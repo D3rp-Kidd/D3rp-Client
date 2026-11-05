@@ -17,6 +17,8 @@ local BLACK = Color3.fromRGB(8, 8, 8)
 local WHITE = Color3.fromRGB(255, 255, 255)
 local PANEL = Color3.fromRGB(14, 14, 14)
 
+local previousIntro = playerGui:FindFirstChild("D3rpStartupIntro")
+if previousIntro then previousIntro:Destroy() end
 local previous = playerGui:FindFirstChild("CoolGuiV2")
 if previous then previous:Destroy() end
 local previousHubs = playerGui:FindFirstChild("D3rpHubsGui")
