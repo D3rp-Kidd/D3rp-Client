@@ -17,8 +17,6 @@ local BLACK = Color3.fromRGB(8, 8, 8)
 local WHITE = Color3.fromRGB(255, 255, 255)
 local PANEL = Color3.fromRGB(14, 14, 14)
 
-local previousIntro = playerGui:FindFirstChild("D3rpStartupIntro")
-if previousIntro then previousIntro:Destroy() end
 local previous = playerGui:FindFirstChild("CoolGuiV2")
 if previous then previous:Destroy() end
 local previousHubs = playerGui:FindFirstChild("D3rpHubsGui")
@@ -988,30 +986,6 @@ if game.PlaceId == 123974602339071 then
     baseplateOpener.LayoutOrder = 140
 end
 
-
--- Server-sided Invisibility toggle.
--- Requires D3rpInvisibilityServer.server.lua in ServerScriptService.
-local invisEnabled = false
-local invisRemote = game:GetService("ReplicatedStorage"):WaitForChild("D3rpInvisibilityRemote", 10)
-
-local invisButton = addButton("Invis: OFF (server)", function(button)
-    if not invisRemote then
-        button.Text = "Invis: Server Script Missing"
-        return
-    end
-    invisEnabled = not invisEnabled
-    invisRemote:FireServer(invisEnabled)
-    button.Text = invisEnabled and "Invis: ON (server)" or "Invis: OFF (server)"
-    originalTexts[button] = button.Text
-    updateLeet()
-end)
-invisButton.LayoutOrder = 85
-
-player.CharacterAdded:Connect(function()
-    -- The server script remembers the toggle and reapplies it after respawn.
-    task.wait(0.5)
-    if invisEnabled and invisRemote then invisRemote:FireServer(true) end
-end)
 
 -- Music Player: plays audio locally for this client.
 local musicPlayer, musicHeader, musicClose = makeWindow(
