@@ -194,17 +194,45 @@ end
 local main, heading, closeButton = makeWindow("Main", "D3rp Client V1.0.3", UDim2.fromOffset(350, 420), UDim2.new(0.5, -175, 0.5, -210), gui)
 makeDraggable(main, heading)
 
--- Disconnect button sits ABOVE the main menu, outside the menu's normal content.
+-- Disconnect, Rejoin, and Reset buttons sit ABOVE the main menu.
 local disconnectButton = Instance.new("TextButton")
 disconnectButton.Name = "DisconnectButton"
-disconnectButton.Size = UDim2.new(1, -20, 0, 30)
+disconnectButton.Size = UDim2.new(1/3, -13, 0, 30)
 disconnectButton.Position = UDim2.new(0, 10, 0, -36)
 styleButton(disconnectButton, "DISCONNECT", RED)
-disconnectButton.TextSize = 14
+disconnectButton.TextSize = 12
 disconnectButton.ZIndex = 10
 disconnectButton.Parent = main
 disconnectButton.Activated:Connect(function()
     player:Kick("Disconnected by user.")
+end)
+
+local rejoinButton = Instance.new("TextButton")
+rejoinButton.Name = "RejoinButton"
+rejoinButton.Size = UDim2.new(1/3, -13, 0, 30)
+rejoinButton.Position = UDim2.new(1/3, 2, 0, -36)
+styleButton(rejoinButton, "REJOIN", WHITE)
+rejoinButton.TextSize = 12
+rejoinButton.ZIndex = 10
+rejoinButton.Parent = main
+rejoinButton.Activated:Connect(function()
+    local TeleportService = game:GetService("TeleportService")
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
+end)
+
+local resetButton = Instance.new("TextButton")
+resetButton.Name = "ResetCharacterButton"
+resetButton.Size = UDim2.new(1/3, -13, 0, 30)
+resetButton.Position = UDim2.new(2/3, -2, 0, -36)
+styleButton(resetButton, "RESET", WHITE)
+resetButton.TextSize = 12
+resetButton.ZIndex = 10
+resetButton.Parent = main
+resetButton.Activated:Connect(function()
+    local humanoid = getHumanoid()
+    if humanoid then
+        humanoid.Health = 0
+    end
 end)
 
 local list = Instance.new("ScrollingFrame")
