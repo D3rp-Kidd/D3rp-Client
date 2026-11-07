@@ -998,3 +998,357 @@ if game.PlaceId == 123974602339071 then
     styleButton(lolitaButton, "lolita Glicher")
     lolitaButton.Parent = baseplateList
     lolitaButton.Activated:Connect(function()
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Jskfhggjxu/My-Script/refs/heads/main/fe-Lolita-glitcher.lua"))()
+        end)
+        if not success then
+            warn("Failed to load lolita Glicher: " .. tostring(err))
+        end
+    end)
+
+    -- TEMPLATE BUTTON 1: paste your own code inside runTemplate1().
+    -- Keep the code in this function so it runs when the button is clicked.
+    local function runTemplate1()
+        -- PASTE YOUR SCRIPT CODE BELOW THIS LINE.
+        -- Example: print("Template 1 clicked!")
+        -- PASTE YOUR SCRIPT CODE ABOVE THIS LINE.
+    end
+
+    local templateButton = Instance.new("TextButton")
+    templateButton.Name = "HackerX"
+    templateButton.Size = UDim2.new(1, 0, 0, 36)
+    templateButton.LayoutOrder = 3
+    styleButton(templateButton, "HackerX")
+    templateButton.Parent = baseplateList
+    templateButton.Activated:Connect(function()
+        local success, err = pcall(function()
+            runTemplate1()
+            loadstring(game:HttpGet("https://scriptblox.com/raw/UP-Just-a-baseplate.-FE-ServerHcker-X-or-Working-226068"))()
+        end)
+        if not success then
+            warn("HackerX 1 failed: " .. tostring(err))
+        end
+    end)
+
+    -- TEMPLATE BUTTON 2: paste your own code inside runTemplate2().
+    local function runTemplate2()
+        -- PASTE YOUR SCRIPT CODE BELOW THIS LINE.
+        -- Example: print("Template 2 clicked!")
+        -- PASTE YOUR SCRIPT CODE ABOVE THIS LINE.
+    end
+
+    local templateButton2 = Instance.new("TextButton")
+    templateButton2.Name = "CustomScript2Button"
+    templateButton2.Size = UDim2.new(1, 0, 0, 36)
+    templateButton2.LayoutOrder = 4
+    styleButton(templateButton2, "FE Admin Noli")
+    templateButton2.Parent = baseplateList
+    templateButton2.Activated:Connect(function()
+        local success, err = pcall(function()
+            runTemplate2()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Jskfhggjxu/My-Script/refs/heads/main/Admin%20Noli%20-%20Limb%20Reanimation.lua"))()
+        end)
+        if not success then
+            warn("FE Admin Noli failed: " .. tostring(err))
+        end
+    end)
+
+    -- TEMPLATE BUTTON 3: paste your own code inside runTemplate3().
+    local function runTemplate3()
+        -- PASTE YOUR SCRIPT CODE BELOW THIS LINE.
+        -- Example: print("Template 3 clicked!")
+        -- PASTE YOUR SCRIPT CODE ABOVE THIS LINE.
+    end
+
+    local templateButton3 = Instance.new("TextButton")
+    templateButton3.Name = "CustomScript3Button"
+    templateButton3.Size = UDim2.new(1, 0, 0, 36)
+    templateButton3.LayoutOrder = 5
+    styleButton(templateButton3, "FE Slasher")
+    templateButton3.Parent = baseplateList
+    templateButton3.Activated:Connect(function()
+        local success, err = pcall(function()
+            runTemplate3()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Jskfhggjxu/My-Script/refs/heads/main/Fe%20Forsaken%20Jason%20-%20Limb%20Reanimation%20v2.lua"))()
+        end)
+        if not success then
+            warn("FE Slasher failed: " .. tostring(err))
+        end
+    end)
+
+    local baseplateOpener = addButton("Just a Baseplate Hub", function()
+        animateWindow(baseplateFrame, not baseplateFrame.Visible)
+    end)
+    baseplateOpener.LayoutOrder = 140
+end
+
+-- Settings opener on the main button list.
+addButton("Settings", function() animateWindow(settingsFrame, not settingsFrame.Visible) end)
+
+-- Main and Hubs resizing controls.
+local function addResizeControls(frame, minSize, maxSize, buttonText, buttonY)
+    local enabled = false
+    local toggle = Instance.new("TextButton")
+    toggle.Name = frame.Name .. "SizableModeButton"; toggle.Size = UDim2.new(1, -20, 0, 30)
+    toggle.Position = UDim2.new(0, 10, 1, buttonY); styleButton(toggle, buttonText .. ": OFF"); toggle.TextSize = 13; toggle.Parent = frame
+    local handle = Instance.new("TextButton")
+    handle.Name = frame.Name .. "ResizeHandle"; handle.Size = UDim2.fromOffset(22, 22)
+    handle.Position = UDim2.new(1, -22, 1, -22); styleButton(handle, "↘", WHITE); handle.Visible = false; handle.Parent = frame    local resizing, resizeStart, sizeStart = false, nil, nil
+    toggle.Activated:Connect(function()
+        enabled = not enabled; toggle.Text = buttonText .. ": " .. (enabled and "ON" or "OFF"); handle.Visible = enabled
+    end)
+    handle.InputBegan:Connect(function(input)
+        if not enabled then return end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            resizing = true; resizeStart = input.Position; sizeStart = frame.AbsoluteSize
+        end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if not resizing then return end
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - resizeStart
+            frame.Size = UDim2.fromOffset(math.clamp(sizeStart.X + delta.X, minSize.X, maxSize.X), math.clamp(sizeStart.Y + delta.Y, minSize.Y, maxSize.Y))
+        end
+    end)
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then resizing = false end
+    end)
+    return toggle, handle
+end
+local mainSizableButton, mainResizeHandle = addResizeControls(main, Vector2.new(300, 250), Vector2.new(650, 650), "Enable Sizable Mode", -120)
+local settingsSizableButton, settingsResizeHandle = addResizeControls(settingsFrame, Vector2.new(320, 240), Vector2.new(700, 650), "Enable Settings Resizing", -45)
+
+-- Fly speed slider in Settings.
+local flySpeedLabel = Instance.new("TextLabel")
+flySpeedLabel.Name = "FlySpeedLabel"
+flySpeedLabel.Position = UDim2.fromOffset(0, 95)
+flySpeedLabel.Size = UDim2.new(1, 0, 0, 22)
+flySpeedLabel.BackgroundTransparency = 1
+flySpeedLabel.TextColor3 = WHITE
+flySpeedLabel.Font = Enum.Font.Code
+flySpeedLabel.TextSize = 14
+flySpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
+flySpeedLabel.Text = "Fly Speed: " .. tostring(flySpeed)
+flySpeedLabel.Parent = settingsBody
+
+local flySpeedTrack = Instance.new("TextButton")
+flySpeedTrack.Name = "FlySpeedSliderTrack"
+flySpeedTrack.Position = UDim2.fromOffset(0, 120)
+flySpeedTrack.Size = UDim2.new(1, 0, 0, 18)
+flySpeedTrack.Text = ""
+flySpeedTrack.BackgroundColor3 = Color3.fromRGB(45, 0, 0)
+flySpeedTrack.BorderSizePixel = 1
+flySpeedTrack.BorderColor3 = RED
+flySpeedTrack.AutoButtonColor = false
+flySpeedTrack.ClipsDescendants = false
+flySpeedTrack.Parent = settingsBody
+
+local flySpeedFill = Instance.new("Frame")
+flySpeedFill.Name = "Fill"
+flySpeedFill.Size = UDim2.new(math.clamp(flySpeed / 200, 0, 1), 0, 1, 0)
+flySpeedFill.BackgroundColor3 = RED
+flySpeedFill.BorderSizePixel = 0
+flySpeedFill.Parent = flySpeedTrack
+
+local flySpeedKnob = Instance.new("Frame")
+flySpeedKnob.Name = "Knob"
+flySpeedKnob.AnchorPoint = Vector2.new(0.5, 0.5)
+flySpeedKnob.Position = UDim2.new(math.clamp(flySpeed / 200, 0, 1), 0, 0.5, 0)
+flySpeedKnob.Size = UDim2.fromOffset(10, 24)
+flySpeedKnob.BackgroundColor3 = WHITE
+flySpeedKnob.BorderColor3 = RED
+flySpeedKnob.BorderSizePixel = 1
+flySpeedKnob.Parent = flySpeedTrack
+
+local draggingFlySlider = false
+local function setFlySpeedFromX(x)
+    local width = math.max(1, flySpeedTrack.AbsoluteSize.X)
+    local alpha = math.clamp((x - flySpeedTrack.AbsolutePosition.X) / width, 0, 1)
+    flySpeed = math.clamp(math.floor(alpha * 200 + 0.5), 1, 200)
+    local fraction = flySpeed / 200
+    flySpeedLabel.Text = "Fly Speed: " .. tostring(flySpeed)
+    flySpeedFill.Size = UDim2.new(fraction, 0, 1, 0)
+    flySpeedKnob.Position = UDim2.new(fraction, 0, 0.5, 0)
+end
+flySpeedTrack.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingFlySlider = true
+        setFlySpeedFromX(input.Position.X)
+    end
+end)
+UIS.InputChanged:Connect(function(input)
+    if draggingFlySlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        setFlySpeedFromX(input.Position.X)
+    end
+end)
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingFlySlider = false
+    end
+end)
+
+-- Utility controls live in Settings instead of cluttering the main window.
+-- These buttons are available after opening Settings.
+mainSizableButton.Parent = settingsBody
+mainSizableButton.Position = UDim2.fromOffset(0, 155)
+mainSizableButton.Size = UDim2.new(1, 0, 0, 32)
+mainSizableButton.TextSize = 13
+mainHideButton.Parent = settingsBody
+mainHideButton.Position = UDim2.fromOffset(0, 195)
+mainHideButton.Size = UDim2.new(1, 0, 0, 32)
+mainHideButton.Text = "Hide Main GUI"
+mainHideButton.TextSize = 13
+settingsSizableButton.Parent = settingsBody
+settingsSizableButton.Position = UDim2.fromOffset(0, 235)
+settingsSizableButton.Size = UDim2.new(1, 0, 0, 32)
+settingsSizableButton.TextSize = 13
+
+local resetSizesButton = Instance.new("TextButton")
+resetSizesButton.Name = "ResetAllWindowSizesButton"
+resetSizesButton.Position = UDim2.fromOffset(0, 275)
+resetSizesButton.Size = UDim2.new(1, 0, 0, 32)
+styleButton(resetSizesButton, "Reset All Window Sizes", WHITE)
+resetSizesButton.TextSize = 13
+resetSizesButton.Parent = settingsBody
+resetSizesButton.Activated:Connect(function()
+    -- Restore every resizable window to the size it had when created.
+    for _, frame in ipairs({main, settingsFrame, hubsFrame}) do
+        local normalSize = normalSizes[frame]
+        if normalSize and frame and frame.Parent then
+            lastWindowSizes[frame] = normalSize
+            tween(frame, 0.2, {Size = normalSize})
+        end
+    end
+end)
+
+-- Keep the resize handles attached to their actual windows, not Settings.
+mainResizeHandle.Parent = main
+settingsResizeHandle.Parent = settingsFrame
+
+-- Click teleport
+local clickTeleportEnabled = false
+addButton("Click TP: OFF", function(button)
+    clickTeleportEnabled = not clickTeleportEnabled; button.Text = clickTeleportEnabled and "Click TP: ON" or "Click TP: OFF"
+    originalTexts[button] = button.Text; updateLeet()
+end)
+mouse.Button1Down:Connect(function()
+    if not clickTeleportEnabled then return end
+    local target = mouse.Target; if not target then return end
+    if target:IsDescendantOf(main) or target:IsDescendantOf(leetButton) or target:IsDescendantOf(hubsFrame) or target:IsDescendantOf(settingsFrame) then return end
+    local character = player.Character; local root = character and character:FindFirstChild("HumanoidRootPart")
+    if root then root.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 4, 0)) end
+end)
+
+UIS.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.KeyCode == hideKeyCode then
+        if mainHidden then showMain() else hideMain() end
+    elseif input.KeyCode == Enum.KeyCode.F then
+        -- Reserved for compatibility; use the Fly button to toggle flight.
+    end
+end)
+player.CharacterAdded:Connect(function() stopFly() end)
+for _, object in ipairs(gui:GetDescendants()) do rememberText(object) end
+
+-- Organize the main menu: gameplay/mod controls first, utility pages at the bottom.
+local orderedItems = {
+    FlyOFFButton = 10,
+    NoclipOFFButton = 20,
+    ESPOFFButton = 30,
+    ItemESPOFFButton = 35,
+    WalkSpeedSliderRow = 40,
+    JumpPowerSliderRow = 50,
+    InfiniteJumpOFFButton = 60,
+    ResetMovementButton = 70,
+    ClickTPOFFButton = 80,
+    CreditsButton = 100,
+    HideGUIQButton = 110,
+    HubsButton = 120,
+    SettingsButton = 130,
+    JustaBaseplateHubButton = 140,
+}
+for _, item in ipairs(list:GetChildren()) do
+    local order = orderedItems[item.Name]
+    if order then
+        item.LayoutOrder = order
+    elseif item:IsA("GuiObject") and item ~= layout then
+        -- Any future/unclassified buttons appear after the mod controls but before utilities.
+        item.LayoutOrder = 90
+    end
+end
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- Startup intro: red flashes, laugh sound, message card morphs into the main GUI.
+-- Audio asset availability depends on Roblox permissions; change this ID if needed.
+main.Visible = false
+local introGui = Instance.new("ScreenGui")
+introGui.Name = "D3rpStartupIntro"
+introGui.IgnoreGuiInset = true
+introGui.ResetOnSpawn = false
+introGui.DisplayOrder = 100
+introGui.Parent = playerGui
+
+local flash = Instance.new("Frame")
+flash.Name = "RedFlash"
+flash.Size = UDim2.fromScale(1, 1)
+flash.BackgroundColor3 = RED
+flash.BackgroundTransparency = 1
+flash.BorderSizePixel = 0
+flash.Parent = introGui
+
+local introCard = Instance.new("Frame")
+introCard.Name = "IntroSquare"
+introCard.AnchorPoint = Vector2.new(0.5, 0.5)
+introCard.Position = UDim2.fromScale(0.5, 0.5)
+introCard.Size = UDim2.fromOffset(30, 30)
+introCard.BackgroundColor3 = BLACK
+introCard.BorderSizePixel = 0
+introCard.ClipsDescendants = true
+introCard.Parent = introGui
+addDoubleOutline(introCard, 3)
+
+local introText = Instance.new("TextLabel")
+introText.Name = "IntroMessage"
+introText.Size = UDim2.new(1, -20, 1, -20)
+introText.Position = UDim2.fromOffset(10, 10)
+introText.BackgroundTransparency = 1
+introText.Text = "Thanks For Using D3rp Client"
+introText.TextColor3 = WHITE
+introText.Font = Enum.Font.Code
+introText.TextSize = 20
+introText.TextWrapped = true
+introText.TextTransparency = 1
+introText.Parent = introCard
+
+local laugh = Instance.new("Sound")
+laugh.Name = "StartupLaugh"
+laugh.SoundId = "rbxassetid://80268147592899"
+laugh.Volume = 0.8
+laugh.Parent = introGui
+pcall(function() laugh:Play() end)
+
+task.spawn(function()
+    -- Smooth red flashes, then a soft fade to black before the intro card appears.
+    for i = 1, 3 do
+        tween(flash, 0.22, {BackgroundColor3 = RED, BackgroundTransparency = 0.05})
+        task.wait(0.22)
+        tween(flash, 0.32, {BackgroundTransparency = 1})
+        task.wait(0.12)
+    end
+    tween(flash, 0.65, {BackgroundColor3 = BLACK, BackgroundTransparency = 0})
+    task.wait(0.25)
+    tween(introCard, 0.55, {Size = UDim2.fromOffset(320, 150)})
+    task.wait(0.3)
+    tween(introText, 0.4, {TextTransparency = 0})
+    task.wait(1.6)
+    tween(introText, 0.35, {TextTransparency = 1})
+    tween(introCard, 0.7, {Size = UDim2.fromOffset(350, 420), BackgroundTransparency = 1})
+    task.wait(0.72)
+    tween(flash, 0.55, {BackgroundTransparency = 1})
+    task.wait(0.58)
+    introGui:Destroy()
+    main.Visible = true
+    animateWindow(main, true, UDim2.fromOffset(350, 420))
+end)
+
+print("D3rp Client V1.0.3 loaded!")
