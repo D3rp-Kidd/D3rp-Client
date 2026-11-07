@@ -1076,6 +1076,22 @@ if game.PlaceId == 123974602339071 then
         end
     end)
 
+    -- OpenSource Admin button
+    local openSourceAdminButton = Instance.new("TextButton")
+    openSourceAdminButton.Name = "OpenSourceAdminButton"
+    openSourceAdminButton.Size = UDim2.new(1, 0, 0, 36)
+    openSourceAdminButton.LayoutOrder = 6
+    styleButton(openSourceAdminButton, "OpenSource Admin")
+    openSourceAdminButton.Parent = baseplateList
+    openSourceAdminButton.Activated:Connect(function()
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/MelonsStuff/FEVerse/refs/heads/main/OpenSource/Admin.luau"))()
+        end)
+        if not success then
+            warn("OpenSource Admin failed: " .. tostring(err))
+        end
+    end)
+
     local baseplateOpener = addButton("Just a Baseplate Hub", function()
         animateWindow(baseplateFrame, not baseplateFrame.Visible)
     end)
