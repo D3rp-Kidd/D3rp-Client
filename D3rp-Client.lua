@@ -1092,6 +1092,22 @@ if game.PlaceId == 123974602339071 then
         end
     end)
 
+    -- FE Terraprisma button
+    local terraprismaButton = Instance.new("TextButton")
+    terraprismaButton.Name = "TerraprismaButton"
+    terraprismaButton.Size = UDim2.new(1, 0, 0, 36)
+    terraprismaButton.LayoutOrder = 7
+    styleButton(terraprismaButton, "FE Terraprisma")
+    terraprismaButton.Parent = baseplateList
+    terraprismaButton.Activated:Connect(function()
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://scriptblox.com/raw/UP-Just-a-baseplate.-Fe-terraprisma-227130"))()
+        end)
+        if not success then
+            warn("FE Terraprisma failed: " .. tostring(err))
+        end
+    end)
+
     local baseplateOpener = addButton("Just a Baseplate Hub", function()
         animateWindow(baseplateFrame, not baseplateFrame.Visible)
     end)
