@@ -932,15 +932,26 @@ if game.PlaceId == 123974602339071 then
     baseplateList.ScrollingDirection = Enum.ScrollingDirection.Y
     baseplateList.ScrollingEnabled = true
     baseplateList.Active = true
-    baseplateList.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    baseplateList.CanvasSize = UDim2.new()
+    -- Keep the hub's list scroll canvas synced to every button added below.
+    baseplateList.AutomaticCanvasSize = Enum.AutomaticSize.None
+    baseplateList.CanvasSize = UDim2.new(0, 0, 0, 0)
+    baseplateList.ClipsDescendants = true
     baseplateList.Position = UDim2.fromOffset(10, 55)
     baseplateList.Size = UDim2.new(1, -20, 1, -65)
     baseplateList.Parent = baseplateFrame
+
     local baseplateLayout = Instance.new("UIListLayout")
     baseplateLayout.Padding = UDim.new(0, 6)
     baseplateLayout.SortOrder = Enum.SortOrder.LayoutOrder
     baseplateLayout.Parent = baseplateList
+
+    local function updateBaseplateCanvas()
+        baseplateList.CanvasSize = UDim2.new(
+            0, 0, 0, baseplateLayout.AbsoluteContentSize.Y + 10
+        )
+    end
+    baseplateLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateBaseplateCanvas)
+    updateBaseplateCanvas()
 
     local locustButton = Instance.new("TextButton")
     locustButton.Name = "FELocustButton"
@@ -1095,7 +1106,7 @@ if game.PlaceId == 123974602339071 then
     -- FE Terraprisma button
     local terraprismaButton = Instance.new("TextButton")
     terraprismaButton.Name = "TerraprismaButton"
-    terraprismaButton.Size = UDim2.new(1, 0, 0, 36)
+    terraprismaButton.Size = UDim2.new(1, -8, 0, 36)
     terraprismaButton.LayoutOrder = 7
     styleButton(terraprismaButton, "FE Terraprisma")
     terraprismaButton.Parent = baseplateList
