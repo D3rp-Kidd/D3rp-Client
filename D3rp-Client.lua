@@ -220,6 +220,7 @@ rejoinButton.Activated:Connect(function()
     TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
 end)
 
+local getHumanoid -- Forward declaration used by the Reset button callback.
 local resetButton = Instance.new("TextButton")
 resetButton.Name = "ResetCharacterButton"
 resetButton.Size = UDim2.new(1/3, -13, 0, 30)
@@ -276,7 +277,7 @@ backButton.TextSize = 18
 backButton.Parent = creditsPage
 
 local function getCharacter() return player.Character end
-local function getHumanoid()
+getHumanoid = function()
     local character = getCharacter()
     return character and character:FindFirstChildOfClass("Humanoid")
 end
