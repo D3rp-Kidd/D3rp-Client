@@ -16,6 +16,8 @@ local DARK_RED = Color3.fromRGB(125, 0, 0)
 local BLACK = Color3.fromRGB(8, 8, 8)
 local WHITE = Color3.fromRGB(255, 255, 255)
 local PANEL = Color3.fromRGB(14, 14, 14)
+local ACCENT = RED
+local THEME_TEXT = WHITE
 
 local previous = playerGui:FindFirstChild("CoolGuiV2")
 if previous then previous:Destroy() end
@@ -36,11 +38,11 @@ local normalSizes = {}
 local lastWindowSizes = {}
 
 local function addDoubleOutline(object, thickness)
-    object.BorderColor3 = RED
+    object.BorderColor3 = ACCENT
     object.BorderSizePixel = thickness or 2
     local stroke = Instance.new("UIStroke")
     stroke.Name = "BrightRedOutline"
-    stroke.Color = RED
+    stroke.Color = ACCENT
     stroke.Thickness = 1.5
     stroke.Transparency = 0
     stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -89,10 +91,10 @@ end
 
 local function styleButton(button, text, color)
     button.BackgroundColor3 = BLACK
-    button.BorderColor3 = RED
+    button.BorderColor3 = ACCENT
     button.BorderSizePixel = 1
     button.Text = text
-    button.TextColor3 = color or WHITE
+    button.TextColor3 = color or THEME_TEXT
     button.Font = Enum.Font.Code
     button.TextSize = 15
     button.AutoButtonColor = false
@@ -311,7 +313,45 @@ local function addButton(label, callback)
 end
 
 closeButton.Activated:Connect(function() gui:Destroy() end)
-backButton.Activated:Connect(function() creditsPage.Visible = false; list.Visible = true end)
+local creditsOpenSize = creditsPage.Size
+local function openCredits()
+    list.Visible = false
+    creditsPage.Visible = true
+    creditsPage.Size = UDim2.new(creditsOpenSize.X.Scale * 0.92, creditsOpenSize.X.Offset * 0.92, creditsOpenSize.Y.Scale * 0.92, creditsOpenSize.Y.Offset * 0.92)
+    creditsPage.BackgroundTransparency = 0.3
+    creditsText.TextTransparency = 1
+    backButton.TextTransparency = 1
+    if dynamicAnimations then
+        tween(creditsPage, 0.24, {Size = creditsOpenSize, BackgroundTransparency = 0}, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        tween(creditsText, 0.32, {TextTransparency = 0})
+        tween(backButton, 0.32, {TextTransparency = 0})
+    else
+        creditsPage.Size = creditsOpenSize
+        creditsPage.BackgroundTransparency = 0
+        creditsText.TextTransparency = 0
+        backButton.TextTransparency = 0
+    end
+end
+local function closeCredits()
+    if dynamicAnimations then
+        local target = UDim2.new(creditsOpenSize.X.Scale * 0.92, creditsOpenSize.X.Offset * 0.92, creditsOpenSize.Y.Scale * 0.92, creditsOpenSize.Y.Offset * 0.92)
+        tween(creditsPage, 0.16, {Size = target, BackgroundTransparency = 0.3}, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        tween(creditsText, 0.12, {TextTransparency = 1})
+        tween(backButton, 0.12, {TextTransparency = 1})
+        task.delay(0.17, function()
+            if creditsPage.Parent then
+                creditsPage.Visible = false
+                creditsPage.Size = creditsOpenSize
+                creditsPage.BackgroundTransparency = 0
+                list.Visible = true
+            end
+        end)
+    else
+        creditsPage.Visible = false
+        list.Visible = true
+    end
+end
+backButton.Activated:Connect(closeCredits)
 
 -- Settings window and the actual Dynamic Animations toggle.
 local settingsFrame, settingsHeader, settingsClose = makeWindow("SettingsWindow", "D3rp Client - Settings", UDim2.fromOffset(360, 280), UDim2.new(0.5, 185, 0.5, -140), gui)
@@ -332,8 +372,69 @@ settingsBody.ClipsDescendants = true
 -- The content is positioned manually, so use an explicit canvas height.
 -- This makes the Settings controls scroll even when the window is small.
 settingsBody.AutomaticCanvasSize = Enum.AutomaticSize.None
-settingsBody.CanvasSize = UDim2.new(0, 0, 0, 590)
+settingsBody.CanvasSize = UDim2.new(0, 0, 0, 735)
 settingsBody.Parent = settingsFrame
+
+-- Theme presets recolor the interface outlines and text without rebuilding the menu.
+local themeTitle = Instance.new("TextLabel")
+themeTitle.Name = "ThemeTitle"
+themeTitle.Position = UDim2.fromOffset(0, 560)
+themeTitle.Size = UDim2.new(1, 0, 0, 24)
+themeTitle.BackgroundTransparency = 1
+themeTitle.Text = "Interface Theme"
+themeTitle.TextColor3 = THEME_TEXT
+themeTitle.Font = Enum.Font.Code
+themeTitle.TextSize = 16
+themeTitle.TextXAlignment = Enum.TextXAlignment.Left
+themeTitle.Parent = settingsBody
+
+local themePresets = {
+    {name = "Red", color = Color3.fromRGB(255, 0, 0)},
+    {name = "Purple", color = Color3.fromRGB(180, 80, 255)},
+    {name = "Blue", color = Color3.fromRGB(55, 145, 255)},
+    {name = "Green", color = Color3.fromRGB(50, 220, 120)},
+    {name = "Gold", color = Color3.fromRGB(255, 195, 45)},
+    {name = "Cyan", color = Color3.fromRGB(45, 220, 235)},
+}
+local function applyTheme(color)
+    ACCENT = color
+    THEME_TEXT = color
+    for _, object in ipairs(gui:GetDescendants()) do
+        if object:IsA("UIStroke") and object.Name == "BrightRedOutline" then
+            object.Color = color
+        elseif object:IsA("GuiObject") and object.BorderSizePixel > 0 then
+            object.BorderColor3 = color
+        end
+        if object:IsA("TextLabel") or object:IsA("TextButton") or object:IsA("TextBox") then
+            object.TextColor3 = color
+        end
+        if object:IsA("ScrollingFrame") then
+            object.ScrollBarImageColor3 = color
+        end
+    end
+end
+for index, preset in ipairs(themePresets) do
+    local themeButton = Instance.new("TextButton")
+    themeButton.Name = preset.name .. "ThemeButton"
+    local column = (index - 1) % 2
+    local row = math.floor((index - 1) / 2)
+    themeButton.Position = UDim2.fromOffset(column * 166, 590 + row * 40)
+    themeButton.Size = UDim2.new(0.5, -5, 0, 34)
+    themeButton.BackgroundColor3 = BLACK
+    themeButton.BorderSizePixel = 1
+    themeButton.BorderColor3 = preset.color
+    themeButton.Text = preset.name
+    themeButton.TextColor3 = preset.color
+    themeButton.Font = Enum.Font.Code
+    themeButton.TextSize = 15
+    themeButton.AutoButtonColor = false
+    themeButton.Parent = settingsBody
+    addDoubleOutline(themeButton, 1)
+    themeButton.Activated:Connect(function()
+        applyTheme(preset.color)
+    end)
+end
+
 local dynamicButton = Instance.new("TextButton")
 dynamicButton.Size = UDim2.new(1, 0, 0, 42)
 styleButton(dynamicButton, "Enable Dynamic animations: ON")
@@ -650,7 +751,7 @@ end)
 -- Movement
 local walkSpeed, jumpPower, infiniteJump = 16, 50, false
 addButton("Fly: OFF", toggleFly)
-addButton("Credits", function() list.Visible = false; creditsPage.Visible = true end)
+addButton("Credits", openCredits)
 
 -- Draggable movement sliders (0-200), styled to match the black/red menu.
 local function addMovementSlider(labelText, initialValue, onValueChanged, getMaxValue)
